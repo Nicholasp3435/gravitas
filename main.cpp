@@ -35,6 +35,21 @@ void renderingThread(sf::RenderWindow* window, vector<Planet*>* planets, bool* r
     window->close();
 }
 
+void physicsThread(sf::RenderWindow* window, vector<Planet*>* planets, bool* run_thread) {
+    while (*run_thread) {
+        // update positions and do other gravity stuff
+        for (long unsigned int i = 0; i < planets->size(); i++)
+        {
+            for (long unsigned int j = 0; j < planets->size(); j++)
+            {
+                if (i == j) continue;
+                (*planets)[i]->addPlanetForce((*planets)[j]);
+            }
+            (*planets)[i]->applyGravity();
+        }
+    }
+}
+
 
 int main()
 {
@@ -54,14 +69,14 @@ int main()
     p1->setVelocity(0, .5);
     p2->setVelocity(0, -.5);
 
-
     planets.push_back(p1);
     planets.push_back(p2);
 
     bool run_thread = true;
 
-    // launch the rendering thread
-    std::thread thread(&renderingThread, &window, &planets, &run_thread);
+    // launch the rendering and physics thread
+    thread render = thread(&renderingThread, &window, &planets, &run_thread);
+    thread physics = thread(&physicsThread, &window, &planets, &run_thread);
 
     // the event/logic/whatever loop
     while (window.isOpen())
@@ -73,7 +88,8 @@ int main()
             if (event->is<sf::Event::Closed>()) 
             {
                 run_thread = false;
-                thread.join();
+                render.join();
+                physics.join();
             }
             else if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) 
             {
@@ -84,18 +100,6 @@ int main()
 
                 planets.push_back(p);
             }
-        }
-
-        // update positions and do other gravity stuff
-        for (long unsigned int i = 0; i < planets.size(); i++)
-        {
-            for (long unsigned int j = 0; j < planets.size(); j++)
-            {
-                if (i == j) continue;
-
-                planets[i]->addPlanetForce(planets[j]);
-            }
-            planets[i]->applyGravity();
         }
     }
 
