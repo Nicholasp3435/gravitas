@@ -35,10 +35,11 @@ void renderingThread(sf::RenderWindow* window, vector<Planet*>* planets, bool* r
     window->close();
 }
 
+
 int main()
 {
     // create the window (remember: it's safer to create it in the main thread due to OS limitations)
-    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML window");
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "Gravitas");
 
     window.setFramerateLimit(120);
         
@@ -79,7 +80,7 @@ int main()
                 int x = mouseButtonPressed->position.x;
                 int y = mouseButtonPressed->position.y;
 
-                Planet* p = new Planet(Planet::makePlanet(1, 10, x, y));
+                Planet* p = new Planet(Planet::makePlanet(.001, 10, x, y));
 
                 planets.push_back(p);
             }

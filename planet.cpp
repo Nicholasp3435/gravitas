@@ -1,11 +1,13 @@
 #include <iostream>
+#include <cmath>
 
 #include <SFML/Graphics.hpp>
 
 #include "planet.h"
 
 #define G 1
-#define step 1.0e-3
+#define STEP 1.0e-3
+#define M_PI 3.14159265358979323846
 
 using namespace std;
 
@@ -43,6 +45,30 @@ void Planet::updateVisualPosition()
     ));
 }
 
+bool Planet::isColliding(Planet* p)
+{
+    sf::Vector2<double> r_21 = p->position - this->position;
+    if (r_21.length() <= p->radius + this->radius)
+    {
+        return true;
+    }
+    return false;
+}
+
+Planet* Planet::collide(Planet* p)
+{
+    sf::Vector2<double> mergedPosition = 0.5 * (this->position + p->position);
+    double merged_radius = sqrt((this->radius * this->radius) + (p->radius * p->radius));
+    double merged_mass = this->mass + p->mass;
+    sf::Vector2<double> mergeVelocity = 1 / (merged_mass) * (this->mass * this->velocity + p->mass * p->velocity);
+
+    Planet* merged = new Planet(Planet::makePlanet(
+        merged_mass, merged_radius, mergedPosition.x, mergedPosition.y
+    ));
+    merged->velocity = mergeVelocity;
+    return merged;
+}
+
 void Planet::addPlanetForce(Planet* p)
 {
     // taken from newton
@@ -60,12 +86,12 @@ void Planet::applyGravity()
 
 void Planet::updatePosition()
 {
-    this->position += this->velocity * step;
+    this->position += this->velocity * STEP;
 }
 
 void Planet::updateVelocity()
 {
-    this->velocity += this->acceleration * step;
+    this->velocity += this->acceleration * STEP;
 }
 
 void Planet::updateAcceleration()

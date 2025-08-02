@@ -19,6 +19,8 @@ class Planet
         sf::CircleShape getVisual();
         void setVelocity(double x, double y);
         void updateVisualPosition();
+        bool isColliding(Planet* p);
+        Planet* collide(Planet* p);
         void addPlanetForce(Planet* p);
         void applyGravity();
 
