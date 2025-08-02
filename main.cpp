@@ -8,13 +8,13 @@
 
 using namespace std;
 
-void renderingThread(sf::RenderWindow* window, vector<Planet*>* planets)
+void renderingThread(sf::RenderWindow* window, vector<Planet*>* planets, bool* run_thread)
 {
     // activate the window's context
     window->setActive(true);
 
     // the rendering loop
-    while (window->isOpen())
+    while (*run_thread)
     {
         // Clear screen
         window->clear();
@@ -29,6 +29,10 @@ void renderingThread(sf::RenderWindow* window, vector<Planet*>* planets)
         // Update the window
         window->display();
     }
+
+    for (Planet* p : *planets) delete p;
+
+    window->close();
 }
 
 int main()
@@ -53,8 +57,10 @@ int main()
     planets.push_back(p1);
     planets.push_back(p2);
 
+    bool run_thread = true;
+
     // launch the rendering thread
-    std::thread thread(&renderingThread, &window, &planets);
+    std::thread thread(&renderingThread, &window, &planets, &run_thread);
 
     // the event/logic/whatever loop
     while (window.isOpen())
@@ -65,7 +71,8 @@ int main()
             // Close window: exit
             if (event->is<sf::Event::Closed>()) 
             {
-                window.close();
+                run_thread = false;
+                thread.join();
             }
             else if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) 
             {
@@ -90,10 +97,6 @@ int main()
             planets[i]->applyGravity();
         }
     }
-
-    for (Planet* p : planets) delete p;
-
-    thread.join();
 
     return EXIT_SUCCESS;
 }
