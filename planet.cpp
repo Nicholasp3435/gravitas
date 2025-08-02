@@ -4,8 +4,8 @@
 
 #include "planet.h"
 
-#define G 0.001
-#define step 0.01
+#define G 1
+#define step 1.0e-3
 
 using namespace std;
 
@@ -31,9 +31,9 @@ sf::CircleShape Planet::getVisual()
     return this->visual;
 }
 
-void Planet::setVelocity(sf::Vector2<double> velocity)
+void Planet::setVelocity(double x, double y)
 {
-    this->velocity = velocity;
+    this->velocity = sf::Vector2<double>(x, y);
 }
 
 void Planet::updateVisualPosition()
@@ -55,11 +55,12 @@ void Planet::applyGravity()
     updateAcceleration();
     updateVelocity();
     updatePosition();
+    this->netForce = sf::Vector2<double>(0, 0);
 }
 
 void Planet::updatePosition()
 {
-    this->position += this->velocity;
+    this->position += this->velocity * step;
 }
 
 void Planet::updateVelocity()

@@ -43,6 +43,16 @@ int main()
 
     vector<Planet*> planets;
 
+    Planet* p1 = new Planet(Planet::makePlanet(100, 10, 400, 300));
+    Planet* p2 = new Planet(Planet::makePlanet(100, 10, 600, 300));
+
+    p1->setVelocity(0, .5);
+    p2->setVelocity(0, -.5);
+
+
+    planets.push_back(p1);
+    planets.push_back(p2);
+
     // launch the rendering thread
     std::thread thread(&renderingThread, &window, &planets);
 

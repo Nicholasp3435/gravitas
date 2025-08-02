@@ -17,7 +17,7 @@ class Planet
         static Planet makePlanet(double mass, double radius, double x, double y);
         sf::Vector2<double> getPosition();
         sf::CircleShape getVisual();
-        void setVelocity(sf::Vector2<double> velocity);
+        void setVelocity(double x, double y);
         void updateVisualPosition();
         void addPlanetForce(Planet* p);
         void applyGravity();
