@@ -4,9 +4,12 @@
 
 #include "planet.h"
 
+#define G 0.001
+#define step 0.01
+
 using namespace std;
 
-Planet Planet::makePlanet(int mass, int radius, double x, double y)
+Planet Planet::makePlanet(double mass, double radius, double x, double y)
 {
     Planet p;
     p.mass = mass;
@@ -14,8 +17,6 @@ Planet Planet::makePlanet(int mass, int radius, double x, double y)
     p.position = sf::Vector2<double>(x, y);
     p.visual = sf::CircleShape(radius);
     p.visual.setPosition(sf::Vector2f(x - radius, y - radius));
-
-    cout << "New planet made at (" << x << ", " << y << ")" << endl;
 
     return p;
 }
@@ -30,6 +31,11 @@ sf::CircleShape Planet::getVisual()
     return this->visual;
 }
 
+void Planet::setVelocity(sf::Vector2<double> velocity)
+{
+    this->velocity = velocity;
+}
+
 void Planet::updateVisualPosition()
 {
     this->visual.setPosition(sf::Vector2f(
@@ -37,12 +43,34 @@ void Planet::updateVisualPosition()
     ));
 }
 
+void Planet::addPlanetForce(Planet* p)
+{
+    // taken from newton
+    sf::Vector2<double> r_21 = p->position - this->position;
+    this->netForce += G * (this->mass * p->mass) / (r_21.lengthSquared()) * r_21.normalized();
+}
+
+void Planet::applyGravity()
+{
+    updateAcceleration();
+    updateVelocity();
+    updatePosition();
+}
+
 void Planet::updatePosition()
 {
     this->position += this->velocity;
 }
 
-void Planet::setVelocity(sf::Vector2<double> velocity)
+void Planet::updateVelocity()
 {
-    this->velocity = velocity;
+    this->velocity += this->acceleration * step;
 }
+
+void Planet::updateAcceleration()
+{
+    // taken from newton
+    this->acceleration = this->netForce / this->mass;
+}
+
+

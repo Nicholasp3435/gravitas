@@ -14,21 +14,25 @@ using namespace std;
 class Planet
 {
     public:
-        static Planet makePlanet(int mass, int radius, double x, double y);
+        static Planet makePlanet(double mass, double radius, double x, double y);
         sf::Vector2<double> getPosition();
         sf::CircleShape getVisual();
-        void updateVisualPosition();
-        void updatePosition();
         void setVelocity(sf::Vector2<double> velocity);
+        void updateVisualPosition();
+        void addPlanetForce(Planet* p);
+        void applyGravity();
 
     private:
-        int mass;
+        double mass;
         int radius;
         sf::Vector2<double> netForce = sf::Vector2<double>(0, 0);
         sf::Vector2<double> position;
         sf::Vector2<double> velocity = sf::Vector2<double>(0, 0);
         sf::Vector2<double> acceleration = sf::Vector2<double>(0, 0);
-        
+        void updatePosition();
+        void updateVelocity();
+        void updateAcceleration();
+
         sf::CircleShape visual;
 };
 

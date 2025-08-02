@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void renderingThread(sf::RenderWindow* window, vector<Planet>* planets)
+void renderingThread(sf::RenderWindow* window, vector<Planet*>* planets)
 {
     // activate the window's context
     window->setActive(true);
@@ -20,10 +20,10 @@ void renderingThread(sf::RenderWindow* window, vector<Planet>* planets)
         window->clear();
 
         // draw planets
-        for (Planet p : *planets) 
+        for (Planet* p : *planets) 
         {
-            p.updateVisualPosition();
-            window->draw(p.getVisual());
+            p->updateVisualPosition();
+            window->draw(p->getVisual());
         }
 
         // Update the window
@@ -36,12 +36,12 @@ int main()
     // create the window (remember: it's safer to create it in the main thread due to OS limitations)
     sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML window");
 
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(120);
         
     // deactivate its OpenGL context
     if (!window.setActive(false)) return EXIT_FAILURE;
 
-    vector<Planet> planets;
+    vector<Planet*> planets;
 
     // launch the rendering thread
     std::thread thread(&renderingThread, &window, &planets);
@@ -62,20 +62,26 @@ int main()
                 int x = mouseButtonPressed->position.x;
                 int y = mouseButtonPressed->position.y;
 
-                Planet p = Planet::makePlanet(10, 10, x, y);
-                p.setVelocity(sf::Vector2<double>(0, 0.001));
+                Planet* p = new Planet(Planet::makePlanet(1, 10, x, y));
 
                 planets.push_back(p);
             }
         }
 
         // update positions and do other gravity stuff
-        // the & makes sure p is a referance
-        for (Planet& p : planets) 
+        for (long unsigned int i = 0; i < planets.size(); i++)
         {
-            p.updatePosition();
+            for (long unsigned int j = 0; j < planets.size(); j++)
+            {
+                if (i == j) continue;
+
+                planets[i]->addPlanetForce(planets[j]);
+            }
+            planets[i]->applyGravity();
         }
     }
+
+    for (Planet* p : planets) delete p;
 
     thread.join();
 
