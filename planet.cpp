@@ -5,9 +5,8 @@
 
 #include "planet.h"
 
-#define G 1
+#define G 1.0
 #define STEP 1.0e-3
-#define M_PI 3.14159265358979323846
 
 using namespace std;
 
@@ -73,7 +72,10 @@ void Planet::addPlanetForce(Planet* p)
 {
     // taken from newton
     sf::Vector2<double> r_21 = p->position - this->position;
-    this->netForce += G * (this->mass * p->mass) / (r_21.lengthSquared()) * r_21.normalized();
+    sf::Vector2<double> force = G * (this->mass * p->mass) / (r_21.lengthSquared()) * r_21.normalized();
+    this->netForce += force;
+    p->netForce -= force;
+
 }
 
 void Planet::applyGravity()
