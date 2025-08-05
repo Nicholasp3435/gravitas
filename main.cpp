@@ -166,11 +166,11 @@ int main()
                 }
                 else if (mouseButtonReleased->button == sf::Mouse::Button::Right)
                 {
-                    mouseHeldInfo.right_held = true;
+                    mouseHeldInfo.right_held = false;
                 }
                 else if (mouseButtonReleased->button == sf::Mouse::Button::Middle)
                 {
-                    mouseHeldInfo.middle_held = true;
+                    mouseHeldInfo.middle_held = false;
                 }
             }
 
